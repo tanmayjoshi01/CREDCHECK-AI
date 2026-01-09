@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CredCheck AI - How It Works</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2563EB",
+                        "primary-dark": "#1E40AF",
+                        "background-light": "#f8f9fa",
+                        "background-dark": "#101922",
+                        "card-light": "#ffffff",
+                        "card-dark": "#182431",
+                        "text-light": "#0d141b",
+                        "text-dark": "#e7edf3",
+                        "subtext-light": "#4c739a",
+                        "subtext-dark": "#94a3b8",
+                        "border-light": "#cfdbe7",
+                        "border-dark": "#334155",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'glow': '0 0 15px rgba(37, 99, 235, 0.3)',
+                    }
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body
+    class="font-display bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark min-h-screen flex flex-col selection:bg-primary/20 selection:text-primary">
+
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-50 w-full border-b border-border-light dark:border-border-dark bg-white/80 dark:bg-background-dark/80 backdrop-blur-md transition-all duration-300">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="flex items-center gap-3 group">
+                        <div
+                            class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-dark text-white shadow-lg shadow-primary/30 transition-transform group-hover:scale-105">
+                            <span class="material-symbols-outlined text-xl">verified_user</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <h1 class="text-xl font-bold tracking-tight leading-none text-gray-900 dark:text-white">
+                                CredCheck AI</h1>
+                            <span class="text-[10px] font-bold text-primary uppercase tracking-wider">News Credibility
+                                Checker</span>
+                        </div>
+                    </a>
+                </div>
+                <nav class="flex items-center gap-4">
+                    <a href="index.html"
+                        class="text-sm font-medium text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary transition-colors">Verification
+                        Tool</a>
+                    <a href="https://github.com/tanmayjoshi01/CREDCHECK-AI" target="_blank"
+                        class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M12 2C6.477 2 2 6.48 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+        <div class="mx-auto max-w-4xl space-y-16">
+
+            <!-- Hero -->
+            <div class="text-center space-y-6 animate-in fade-in duration-700">
+                <h2 class="text-4xl md:text-6xl font-black tracking-tight text-text-light dark:text-text-dark">
+                    How <span class="text-gradient">CredCheck AI</span> Works
+                </h2>
+                <p class="text-xl text-subtext-light dark:text-subtext-dark max-w-2xl mx-auto leading-relaxed">
+                    Our multi-layered verification system combines advanced natural language processing, computer
+                    vision, and real-time fact-checking.
+                </p>
+            </div>
+
+            <!-- Steps -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
+                <!-- Connecting Line (Desktop) -->
+                <div
+                    class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-border-light dark:via-border-dark to-transparent -z-10">
+                </div>
+
+                <!-- Step 1: Text Analysis -->
+                <div
+                    class="bg-card-light dark:bg-card-dark rounded-2xl p-8 border border-border-light dark:border-border-dark shadow-soft hover:shadow-glow transition-all duration-300 hover:-translate-y-2 animate-in slide-in-from-bottom-8 duration-700 delay-100 hover-card">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-6 shadow-sm">
+                        <span class="material-symbols-outlined text-3xl">psychology_alt</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-text-light dark:text-text-dark mb-3">1. Linguistic Analysis</h3>
+                    <p class="text-subtext-light dark:text-subtext-dark leading-relaxed">
+                        We analyze the text for sensationalism, emotional manipulation, and bias patterns commonly found
+                        in fake news. Our AI detects clickbait structures and subjective language.
+                    </p>
+                </div>
+
+                <!-- Step 2: Image Verification -->
+                <div
+                    class="bg-card-light dark:bg-card-dark rounded-2xl p-8 border border-border-light dark:border-border-dark shadow-soft hover:shadow-glow transition-all duration-300 hover:-translate-y-2 animate-in slide-in-from-bottom-8 duration-700 delay-200 hover-card">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 shadow-sm">
+                        <span class="material-symbols-outlined text-3xl">image_search</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-text-light dark:text-text-dark mb-3">2. Image-Text Consistency
+                    </h3>
+                    <p class="text-subtext-light dark:text-subtext-dark leading-relaxed">
+                        If an image is provided, we compare its content with the text. We detect if the image is
+                        unrelated, manipulated, or taken out of context to mislead the reader.
+                    </p>
+                </div>
+
+                <!-- Step 3: Source Verification -->
+                <div
+                    class="bg-card-light dark:bg-card-dark rounded-2xl p-8 border border-border-light dark:border-border-dark shadow-soft hover:shadow-glow transition-all duration-300 hover:-translate-y-2 animate-in slide-in-from-bottom-8 duration-700 delay-300 hover-card">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center mb-6 shadow-sm">
+                        <span class="material-symbols-outlined text-3xl">fact_check</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-text-light dark:text-text-dark mb-3">3. Source Verification</h3>
+                    <p class="text-subtext-light dark:text-subtext-dark leading-relaxed">
+                        We cross-reference the claims with a vast database of trusted news outlets. We check if major
+                        sources are reporting the same story and verify specific facts.
+                    </p>
+                </div>
+
+                <!-- Step 4: Trust Score -->
+                <div
+                    class="bg-card-light dark:bg-card-dark rounded-2xl p-8 border border-border-light dark:border-border-dark shadow-soft hover:shadow-glow transition-all duration-300 hover:-translate-y-2 animate-in slide-in-from-bottom-8 duration-700 delay-400 hover-card">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-6 shadow-sm">
+                        <span class="material-symbols-outlined text-3xl">score</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-text-light dark:text-text-dark mb-3">4. Trust Score Calculation
+                    </h3>
+                    <p class="text-subtext-light dark:text-subtext-dark leading-relaxed">
+                        Finally, we aggregate all data points into a single Trust Score (0-100). This score represents
+                        the overall credibility probability, giving you a quick and easy verdict.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="text-center pt-8 animate-in fade-in duration-1000 delay-500">
+                <a href="index.html"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-dark px-8 py-4 text-lg font-bold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-primary/50 hover:-translate-y-1 group">
+                    <span class="material-symbols-outlined group-hover:animate-pulse">verified_user</span>
+                    Try CredCheck AI Now
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="border-t border-border-light dark:border-border-dark bg-white dark:bg-background-dark py-8 mt-auto">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm text-subtext-light dark:text-subtext-dark font-medium">
+                Built for Hackathon • <span class="text-primary font-bold">CredCheck AI</span>
+            </p>
+            <p class="text-xs text-gray-400 mt-2">
+                Fighting misinformation with artificial intelligence.
+            </p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

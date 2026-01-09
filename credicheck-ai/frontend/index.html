@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html lang="en" class="">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CrediCheck AI - About</title>
-    
+    <title>CredCheck AI - News Verification</title>
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
     <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#2b8cee",
+                        "primary": "#2563EB",
+                        "primary-dark": "#1E40AF",
                         "background-light": "#f8f9fa",
                         "background-dark": "#101922",
                         "card-light": "#ffffff",
@@ -26,84 +30,360 @@
                         "subtext-dark": "#94a3b8",
                         "border-light": "#cfdbe7",
                         "border-dark": "#334155",
+                        "success": "#16A34A",
+                        "warning": "#F59E0B",
+                        "danger": "#DC2626",
                     },
                     fontFamily: {
                         "display": ["Inter", "sans-serif"]
                     },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "md": "0.375rem",
-                        "lg": "0.75rem",
-                        "xl": "1rem",
-                        "full": "9999px"
-                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'glow': '0 0 15px rgba(37, 99, 235, 0.3)',
+                    }
                 },
             },
         }
     </script>
-    <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="font-display bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
-    <div class="relative flex min-h-screen w-full flex-col items-center text-gray-800 dark:text-gray-200">
-        <header class="w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-700 py-4">
-                <div class="flex items-center gap-3 text-gray-900 dark:text-white">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white">
-                        <span class="material-symbols-outlined text-xl">verified</span>
-                    </div>
-                    <h1 class="text-xl font-bold">CrediCheck AI</h1>
+
+<body
+    class="font-display bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark min-h-screen flex flex-col selection:bg-primary/20 selection:text-primary">
+
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-50 w-full border-b border-border-light dark:border-border-dark bg-white/80 dark:bg-background-dark/80 backdrop-blur-md transition-all duration-300">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="flex items-center gap-3 group">
+                        <div
+                            class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-dark text-white shadow-lg shadow-primary/30 transition-transform group-hover:scale-105">
+                            <span class="material-symbols-outlined text-xl">verified_user</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <h1 class="text-xl font-bold tracking-tight leading-none text-gray-900 dark:text-white">
+                                CredCheck AI</h1>
+                            <span class="text-[10px] font-bold text-primary uppercase tracking-wider">News Credibility
+                                Checker</span>
+                        </div>
+                    </a>
                 </div>
+                <nav class="flex items-center gap-4">
+                    <a href="how-it-works.html"
+                        class="text-sm font-medium text-subtext-light dark:text-subtext-dark hover:text-primary dark:hover:text-primary transition-colors">How
+                        It Works</a>
+                    <a href="https://github.com/tanmayjoshi01/CREDCHECK-AI" target="_blank"
+                        class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                    </a>
+                </nav>
             </div>
-        </header>
-        
-        <main class="flex w-full max-w-5xl flex-1 flex-col items-center px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
-            <div class="flex w-full flex-col items-center gap-3 text-center mb-8">
-                <p class="text-primary text-base font-bold leading-normal">About CrediCheck AI</p>
-                <p class="text-gray-900 dark:text-white text-4xl sm:text-5xl font-black leading-tight tracking-tighter">Credibility Analysis for Digital Content</p>
-                <p class="max-w-2xl text-gray-500 dark:text-gray-400 text-lg font-normal leading-normal">CrediCheck AI provides a comprehensive credibility score by cross-referencing text, images, and trusted sources.</p>
-            </div>
-            <div class="w-full max-w-3xl text-center space-y-4 mb-16">
-                <p class="text-gray-700 dark:text-gray-300 text-base font-normal leading-relaxed">
-                    The spread of misinformation erodes trust. It's increasingly difficult to distinguish fact from fiction online.
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div class="mx-auto max-w-5xl space-y-8">
+
+            <!-- Hero Section -->
+            <div class="text-center space-y-4 mb-10 animate-in fade-in duration-700">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wide mb-2 border border-primary/20">
+                    <span class="relative flex h-2 w-2">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                    AI-Powered Analysis
+                </div>
+                <h2 class="text-4xl md:text-6xl font-black tracking-tight text-text-light dark:text-text-dark">
+                    Verify News <span class="text-gradient">Credibility</span>
+                </h2>
+                <p class="text-lg text-subtext-light dark:text-subtext-dark max-w-2xl mx-auto leading-relaxed">
+                    Paste news text or upload an image to analyze credibility using advanced AI, source
+                    cross-referencing, and emotional tone analysis.
                 </p>
             </div>
-            <h2 class="text-gray-900 dark:text-white text-3xl font-bold leading-tight tracking-tight mb-12">How It Works</h2>
-            <div class="grid w-full max-w-4xl grid-cols-1 gap-8 md:grid-cols-3 mb-16">
-                <div class="flex flex-col items-center gap-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-6 text-center">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary">
-                        <span class="material-symbols-outlined text-2xl">text_fields</span>
+
+            <!-- Input Section -->
+            <div
+                class="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft border border-border-light dark:border-border-dark overflow-hidden transition-all duration-300 hover:shadow-glow animate-in slide-in-from-bottom-8 duration-700 delay-100">
+                <div class="h-1 w-full bg-gradient-to-r from-primary via-purple-500 to-pink-500"></div>
+                <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                    <!-- Text Input -->
+                    <div class="flex flex-col h-full">
+                        <label for="text-input"
+                            class="flex items-center gap-2 text-sm font-bold text-text-light dark:text-text-dark mb-3 uppercase tracking-wide">
+                            <span class="material-symbols-outlined text-primary text-xl">article</span>
+                            News Text
+                        </label>
+                        <div class="relative flex-1 group">
+                            <textarea id="text-input"
+                                class="w-full h-full min-h-[250px] p-4 rounded-xl bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-light dark:text-text-dark placeholder:text-subtext-light dark:placeholder:text-subtext-dark focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none text-base leading-relaxed group-hover:border-primary/30"
+                                placeholder="Paste the news article content, headline, or social media post here..."></textarea>
+                            <div
+                                class="absolute bottom-3 right-3 text-xs text-subtext-light dark:text-subtext-dark pointer-events-none bg-background-light dark:bg-background-dark px-2 py-1 rounded-md opacity-70 border border-border-light dark:border-border-dark">
+                                Min 20 chars
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Linguistic Analysis</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Scans text for emotional manipulation and signs of bias.</p>
-                </div>
-                <div class="flex flex-col items-center gap-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-6 text-center">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary">
-                        <span class="material-symbols-outlined text-2xl">image_search</span>
+
+                    <!-- Image Upload & Actions -->
+                    <div class="flex flex-col gap-6">
+                        <div>
+                            <label
+                                class="flex items-center gap-2 text-sm font-bold text-text-light dark:text-text-dark mb-3 uppercase tracking-wide">
+                                <span class="material-symbols-outlined text-primary text-xl">image</span>
+                                Related Image (Optional)
+                            </label>
+                            <div class="relative group">
+                                <input type="file" id="image-input" accept="image/*" class="hidden">
+                                <label for="image-input"
+                                    class="flex flex-col items-center justify-center w-full h-[180px] rounded-xl border-2 border-dashed border-border-light dark:border-border-dark bg-background-light/50 dark:bg-background-dark/50 cursor-pointer hover:bg-primary/5 hover:border-primary/50 transition-all duration-300 group-hover:scale-[1.01]">
+                                    <div id="upload-placeholder"
+                                        class="flex flex-col items-center gap-3 text-center p-4">
+                                        <div
+                                            class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-1 group-hover:bg-primary group-hover:text-white transition-colors">
+                                            <span class="material-symbols-outlined text-2xl">cloud_upload</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-text-light dark:text-text-dark">Click
+                                                to upload or drag and drop</p>
+                                            <p class="text-xs text-subtext-light dark:text-subtext-dark mt-1">SVG, PNG,
+                                                JPG or GIF (max 5MB)</p>
+                                        </div>
+                                    </div>
+                                    <div id="image-preview-container" class="hidden w-full h-full p-2 relative">
+                                        <img id="image-preview" src="" alt="Preview"
+                                            class="w-full h-full object-contain rounded-lg shadow-sm">
+                                        <button id="remove-image"
+                                            class="absolute top-3 right-3 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors shadow-md hover:scale-110"
+                                            title="Remove image">
+                                            <span class="material-symbols-outlined text-lg">close</span>
+                                        </button>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto">
+                            <button id="analyze-button"
+                                class="group relative w-full h-14 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg shadow-primary/30 transition-all hover:shadow-primary/50 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none">
+                                <div
+                                    class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
+                                </div>
+                                <div
+                                    class="relative flex items-center justify-center gap-3 font-bold text-lg tracking-wide">
+                                    <span
+                                        class="material-symbols-outlined text-2xl group-hover:animate-bounce">query_stats</span>
+                                    <span id="analyze-text">Analyze Credibility</span>
+                                    <div id="analyze-loading" class="hidden loading-spinner"></div>
+                                </div>
+                            </button>
+                            <p class="text-center text-xs text-subtext-light dark:text-subtext-dark mt-3">
+                                By analyzing, you agree to our <a href="#" class="underline hover:text-primary">Terms of
+                                    Service</a>. Results are AI-generated estimates.
+                            </p>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Image–Text Consistency</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Verifies if images and their surrounding text are contextually aligned.</p>
-                </div>
-                <div class="flex flex-col items-center gap-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-6 text-center">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary">
-                        <span class="material-symbols-outlined text-2xl">fact_check</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Trusted Source Verification</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Cross-references claims with a database of reputable sources.</p>
                 </div>
             </div>
-            <div class="mt-8">
-                <a href="verify.html" class="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-base font-bold text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark">
-                    Verify Content
-                </a>
+
+            <!-- Error Message Container -->
+            <div id="error-container" class="hidden"></div>
+
+            <!-- Loading State -->
+            <div id="loading-state"
+                class="hidden py-12 flex flex-col items-center justify-center text-center animate-in fade-in duration-500">
+                <div class="relative w-24 h-24 mb-6">
+                    <div class="absolute inset-0 rounded-full border-4 border-primary/20"></div>
+                    <div
+                        class="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin">
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl text-primary animate-pulse">psychology</span>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold text-text-light dark:text-text-dark mb-2">Analyzing Content</h3>
+                <p class="text-subtext-light dark:text-subtext-dark max-w-md animate-pulse">
+                    Our AI is cross-referencing sources, checking image consistency, and analyzing linguistic
+                    patterns...
+                </p>
             </div>
-        </main>
-    </div>
+
+            <!-- Results Section -->
+            <div id="results-section" class="hidden space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+
+                <!-- Top Row: Verdict & Trust Score -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <!-- Verdict Card -->
+                    <div
+                        class="md:col-span-2 bg-card-light dark:bg-card-dark rounded-2xl shadow-soft border border-border-light dark:border-border-dark overflow-hidden relative hover-card">
+                        <div id="verdict-color-bar"
+                            class="absolute left-0 top-0 bottom-0 w-2 bg-gray-300 transition-colors duration-500"></div>
+                        <div
+                            class="p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 h-full">
+                            <div class="flex-1">
+                                <h3
+                                    class="text-xs font-bold text-subtext-light dark:text-subtext-dark uppercase tracking-widest mb-2">
+                                    Final Verdict</h3>
+                                <div class="flex items-center gap-4 mb-3">
+                                    <div id="verdict-badge"
+                                        class="px-4 py-1 rounded-full text-sm font-black uppercase tracking-wide bg-gray-100 text-gray-600 transition-all duration-500">
+                                        Unknown
+                                    </div>
+                                </div>
+                                <p id="verdict-summary"
+                                    class="text-text-light dark:text-text-dark text-base leading-relaxed max-w-xl font-medium">
+                                    Analysis pending...
+                                </p>
+                            </div>
+                            <div class="hidden md:block h-16 w-[1px] bg-border-light dark:border-border-dark"></div>
+                            <div class="flex flex-col gap-2 min-w-[140px]">
+                                <div
+                                    class="flex items-center justify-between text-xs font-semibold text-subtext-light dark:text-subtext-dark uppercase">
+                                    <span>Confidence</span>
+                                    <span id="confidence-value">--%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                                    <div id="confidence-bar"
+                                        class="bg-primary h-2.5 rounded-full transition-all duration-1000 w-0"></div>
+                                </div>
+                                <div id="cache-badge"
+                                    class="hidden inline-flex items-center gap-1 self-start px-2 py-1 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 mt-2 border border-blue-100 dark:border-blue-800">
+                                    <span class="material-symbols-outlined text-[14px]">bolt</span>
+                                    CACHED RESULT
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trust Score Card -->
+                    <div
+                        class="bg-card-light dark:bg-card-dark rounded-2xl shadow-soft border border-border-light dark:border-border-dark p-6 flex flex-col items-center justify-center relative overflow-hidden hover-card">
+                        <div class="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-primary/5">
+                        </div>
+                        <h3
+                            class="text-xs font-bold text-subtext-light dark:text-subtext-dark uppercase tracking-widest mb-4 relative z-10">
+                            Trust Score</h3>
+
+                        <div class="relative w-36 h-36 flex items-center justify-center">
+                            <!-- Circular Progress Background -->
+                            <svg class="w-full h-full transform -rotate-90 drop-shadow-md">
+                                <circle cx="72" cy="72" r="60" stroke="currentColor" stroke-width="12"
+                                    fill="transparent" class="text-gray-100 dark:text-gray-800" />
+                                <circle id="trust-score-circle" cx="72" cy="72" r="60" stroke="currentColor"
+                                    stroke-width="12" fill="transparent" stroke-dasharray="376.99"
+                                    stroke-dashoffset="376.99" stroke-linecap="round"
+                                    class="text-primary transition-all duration-1500 ease-out trust-score-circle" />
+                            </svg>
+                            <div class="absolute flex flex-col items-center">
+                                <span id="trust-score-value"
+                                    class="text-4xl font-black text-text-light dark:text-text-dark tracking-tight">0%</span>
+                            </div>
+                        </div>
+
+                        <p id="trust-score-label"
+                            class="mt-4 text-sm font-bold text-center text-subtext-light dark:text-subtext-dark relative z-10 uppercase tracking-wide">
+                            Calculating...</p>
+                    </div>
+                </div>
+
+                <!-- Middle Row: Details Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <!-- Explanation Panel -->
+                    <div
+                        class="lg:col-span-1 bg-card-light dark:bg-card-dark rounded-2xl shadow-soft border border-border-light dark:border-border-dark p-6 hover-card">
+                        <div
+                            class="flex items-center gap-3 mb-4 border-b border-border-light dark:border-border-dark pb-3">
+                            <div
+                                class="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+                                <span class="material-symbols-outlined">psychology_alt</span>
+                            </div>
+                            <h3 class="font-bold text-text-light dark:text-text-dark">Analysis Details</h3>
+                        </div>
+                        <div id="explanation-content" class="space-y-3 text-sm text-text-light dark:text-text-dark">
+                            <p class="text-subtext-light dark:text-subtext-dark italic">No detailed explanation
+                                available.</p>
+                        </div>
+                    </div>
+
+                    <!-- Image Context -->
+                    <div
+                        class="lg:col-span-1 bg-card-light dark:bg-card-dark rounded-2xl shadow-soft border border-border-light dark:border-border-dark p-6 hover-card">
+                        <div
+                            class="flex items-center gap-3 mb-4 border-b border-border-light dark:border-border-dark pb-3">
+                            <div
+                                class="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                                <span class="material-symbols-outlined">image_search</span>
+                            </div>
+                            <h3 class="font-bold text-text-light dark:text-text-dark">Image Context</h3>
+                        </div>
+                        <div id="image-context-content"
+                            class="flex flex-col items-center justify-center h-40 text-center">
+                            <span
+                                class="material-symbols-outlined text-4xl text-gray-300 dark:text-gray-600 mb-2">hide_image</span>
+                            <p class="text-subtext-light dark:text-subtext-dark text-sm">No image analyzed</p>
+                        </div>
+                    </div>
+
+                    <!-- Source Verification -->
+                    <div
+                        class="lg:col-span-1 bg-card-light dark:bg-card-dark rounded-2xl shadow-soft border border-border-light dark:border-border-dark p-6 hover-card">
+                        <div
+                            class="flex items-center gap-3 mb-4 border-b border-border-light dark:border-border-dark pb-3">
+                            <div
+                                class="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+                                <span class="material-symbols-outlined">fact_check</span>
+                            </div>
+                            <h3 class="font-bold text-text-light dark:text-text-dark">Source Check</h3>
+                        </div>
+                        <div id="source-verification-content" class="space-y-3">
+                            <div
+                                class="flex items-start gap-3 p-3 rounded-lg bg-background-light dark:bg-background-dark">
+                                <span class="material-symbols-outlined text-gray-400 mt-0.5 text-lg">search_off</span>
+                                <div>
+                                    <p class="text-sm font-medium text-text-light dark:text-text-dark">Waiting for
+                                        analysis</p>
+                                    <p class="text-xs text-subtext-light dark:text-subtext-dark">Sources will appear
+                                        here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Response Time -->
+                <div class="text-center pb-8">
+                    <p id="response-time"
+                        class="text-xs text-subtext-light dark:text-subtext-dark font-mono opacity-60">
+                        Response time: --ms
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-border-light dark:border-border-dark bg-white dark:bg-background-dark py-8 mt-auto">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm text-subtext-light dark:text-subtext-dark font-medium">
+                Built for Hackathon • <span class="text-primary font-bold">CredCheck AI</span>
+            </p>
+            <p class="text-xs text-gray-400 mt-2">
+                Fighting misinformation with artificial intelligence.
+            </p>
+        </div>
+    </footer>
+
     <script src="script.js"></script>
 </body>
-</html>
 
+</html>

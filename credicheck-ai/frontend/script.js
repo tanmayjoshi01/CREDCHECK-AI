@@ -1,378 +1,395 @@
-// CrediCheck AI - Backend Integration
-// Backend integration for Day 2
-
+// CredCheck AI - Frontend Logic
 const API_BASE_URL = 'http://127.0.0.1:5000';
 
-// Wait for DOM to be ready
-document.addEventListener('DOMContentLoaded', function() {
-    const analyzeButton = document.getElementById('analyze-button');
+document.addEventListener('DOMContentLoaded', () => {
+    // Elements
     const textInput = document.getElementById('text-input');
     const imageInput = document.getElementById('image-input');
-    
+    const analyzeButton = document.getElementById('analyze-button');
+    const analyzeText = document.getElementById('analyze-text');
+    const analyzeLoading = document.getElementById('analyze-loading');
+    const loadingState = document.getElementById('loading-state');
+    const resultsSection = document.getElementById('results-section');
+    const errorContainer = document.getElementById('error-container');
+    const imagePreviewContainer = document.getElementById('image-preview-container');
+    const imagePreview = document.getElementById('image-preview');
+    const uploadPlaceholder = document.getElementById('upload-placeholder');
+    const removeImageButton = document.getElementById('remove-image');
+
+    // State
+    let selectedImageFile = null;
+
+    // --- Event Listeners ---
+
+    // Image Upload
+    if (imageInput) {
+        imageInput.addEventListener('change', handleImageSelect);
+    }
+
+    // Remove Image
+    if (removeImageButton) {
+        removeImageButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            clearImageSelection();
+        });
+    }
+
+    // Analyze Button
     if (analyzeButton) {
         analyzeButton.addEventListener('click', handleAnalyze);
     }
-    
-    // Handle image upload feedback
-    if (imageInput) {
-        imageInput.addEventListener('change', handleImageChange);
-    }
-});
 
-function handleImageChange(event) {
-    const imageInput = event.target;
-    const imageStatus = document.getElementById('image-status');
-    const imagePreview = document.getElementById('image-preview');
-    const uploadArea = imageInput.closest('.flex.flex-col').querySelector('.rounded-lg.border-2');
-    
-    if (imageInput.files && imageInput.files[0]) {
-        const file = imageInput.files[0];
-        const fileName = file.name;
-        
-        // Show filename
-        if (imageStatus) {
-            imageStatus.innerHTML = `<p class="text-sm text-green-600 dark:text-green-400 font-medium">Image uploaded: ${fileName}</p>`;
-        }
-        
-        // Show small preview
-        if (imagePreview) {
+    // --- Handlers ---
+
+    function handleImageSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                showError('Image size must be less than 5MB');
+                return;
+            }
+
+            selectedImageFile = file;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview" class="max-w-32 max-h-32 mx-auto rounded border border-border-light dark:border-border-dark">`;
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreviewContainer.classList.remove('hidden');
+                uploadPlaceholder.classList.add('hidden');
             };
             reader.readAsDataURL(file);
         }
-        
-        // Hide placeholder text
-        if (uploadArea) {
-            const placeholderText = uploadArea.querySelector('p.text-base');
-            const subText = uploadArea.querySelector('p.text-sm');
-            if (placeholderText) placeholderText.style.display = 'none';
-            if (subText) subText.style.display = 'none';
-        }
-    } else {
-        // Clear status and preview
-        if (imageStatus) {
-            imageStatus.innerHTML = '';
-        }
-        if (imagePreview) {
-            imagePreview.innerHTML = '';
-        }
-        
-        // Restore placeholder text
-        if (uploadArea) {
-            const placeholderText = uploadArea.querySelector('p.text-base');
-            const subText = uploadArea.querySelector('p.text-sm');
-            if (placeholderText) placeholderText.style.display = 'block';
-            if (subText) subText.style.display = 'block';
-        }
     }
-}
 
-function handleAnalyze() {
-    const textInput = document.getElementById('text-input');
-    const imageInput = document.getElementById('image-input');
-    const analyzeButton = document.getElementById('analyze-button');
-    
-    // Get input values
-    const text = textInput ? textInput.value.trim() : '';
-    const imageFile = imageInput ? imageInput.files[0] : null;
-    
-    // Validate input
-    if (!text) {
-        showError('Please enter text to analyze.');
-        return;
+    function clearImageSelection() {
+        selectedImageFile = null;
+        imageInput.value = '';
+        imagePreview.src = '';
+        imagePreviewContainer.classList.add('hidden');
+        uploadPlaceholder.classList.remove('hidden');
     }
-    
-    // Disable button and show loading
-    if (analyzeButton) {
+
+    async function handleAnalyze() {
+        const text = textInput.value.trim();
+
+        // Validation
+        if (!text && !selectedImageFile) {
+            showError('Please provide text or an image to analyze.');
+            return;
+        }
+
+        if (text.length > 0 && text.length < 20) {
+            showError('Text is too short. Please provide at least 20 characters.');
+            return;
+        }
+
+        // Reset UI
+        hideError();
+        resultsSection.classList.add('hidden');
+        loadingState.classList.remove('hidden');
+
+        // Button Loading State
         analyzeButton.disabled = true;
-        analyzeButton.innerHTML = '<span class="loading"></span> Analyzing...';
-    }
-    
-    // Function to send request after image is processed (if present)
-    const sendRequest = (imageData) => {
-        // Prepare payload
-        const payload = {
-            text: text,
-            headline: text // Use text as headline if not provided separately
-        };
-        
-        // Add image data if file is selected
-        if (imageData) {
-            payload.image_data = imageData;
-            payload.image_filename = imageFile.name;
-        }
-        
-        // Send request to backend
-        fetch(`${API_BASE_URL}/analyze-full`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload)
-        })
-        .then(response => {
+        analyzeText.textContent = 'Analyzing...';
+        analyzeLoading.classList.remove('hidden');
+
+        try {
+            // Prepare Payload
+            let imageData = null;
+            if (selectedImageFile) {
+                imageData = await readFileAsBase64(selectedImageFile);
+            }
+
+            const payload = {
+                text: text,
+                headline: text.split('\n')[0].substring(0, 100), // Simple headline extraction
+                image_path: null // Backend expects path or data
+            };
+
+            if (imageData) {
+                payload.image_data = imageData;
+            }
+
+            // Call API
+            const response = await fetch(`${API_BASE_URL}/analyze-full`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
             if (!response.ok) {
-                return response.json().then(err => {
-                    throw new Error(err.error || 'Backend request failed');
-                });
+                throw new Error(`Server error: ${response.status}`);
             }
-            return response.json();
-        })
-        .then(data => {
-            displayResults(data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showError(error.message || 'Failed to connect to backend. Make sure the server is running.');
-        })
-        .finally(() => {
-            // Re-enable button
-            if (analyzeButton) {
-                analyzeButton.disabled = false;
-                analyzeButton.innerHTML = '<span class="material-symbols-outlined">query_stats</span><span class="truncate">Analyze</span>';
-            }
-        });
-    };
-    
-    // Process image if present, otherwise send request immediately
-    if (imageFile) {
-        // Convert image to base64
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            // Remove data URL prefix (e.g., "data:image/jpeg;base64,") if you want just the base64 string
-            // Or keep it if backend expects full data URL
-            sendRequest(e.target.result);
-        };
-        reader.onerror = function() {
-            showError('Failed to read image file.');
-            if (analyzeButton) {
-                analyzeButton.disabled = false;
-                analyzeButton.innerHTML = '<span class="material-symbols-outlined">query_stats</span><span class="truncate">Analyze</span>';
-            }
-        };
-        reader.readAsDataURL(imageFile);
-    } else {
-        // No image, send request immediately
-        sendRequest(null);
-    }
-}
 
-function displayResults(data) {
-    // Display text analysis (from aggregated result)
-    const textAnalysisDiv = document.getElementById('text-analysis-result');
-    if (textAnalysisDiv) {
-        let html = '';
-        if (data.final_label) {
-            html += `<p class="font-semibold">Classification: ${data.final_label}</p>`;
+            const data = await response.json();
+
+            // Render Results
+            renderResults(data);
+
+        } catch (error) {
+            console.error('Analysis failed:', error);
+            showError('Analysis failed. Please try again later. (' + error.message + ')');
+        } finally {
+            loadingState.classList.add('hidden');
+            analyzeButton.disabled = false;
+            analyzeText.textContent = 'Analyze Credibility';
+            analyzeLoading.classList.add('hidden');
         }
-        if (data.final_trust_score !== undefined) {
-            html += `<p>Trust Score: ${data.final_trust_score}%</p>`;
-        }
-        if (data.cache_hit !== undefined) {
-            html += `<p class="text-sm mt-2">Cache: ${data.cache_hit ? 'Hit' : 'Miss'}</p>`;
-        }
-        textAnalysisDiv.innerHTML = html || '<p>No text analysis data available.</p>';
     }
-    
-    // Display image context (if available in response)
-    const imageContextDiv = document.getElementById('image-context-result');
-    if (imageContextDiv) {
-        let html = '';
-        
-        // Check if image analysis was actually performed by checking for image_context field
-        const hasImageContext = data.image_context !== undefined && 
-                                data.image_context !== null && 
-                                data.image_context !== '';
-        
-        if (hasImageContext) {
-            html += `<p class="text-sm font-medium text-text-light dark:text-text-dark">Image analysis performed</p>`;
-            
-            // Show specific status based on image_context value
-            if (data.image_context === "Mismatch" || data.image_context === "Suspicious Mismatch") {
-                html += `<p class="text-sm mt-1 text-orange-600 dark:text-orange-400">⚠ Image–headline mismatch detected</p>`;
-            } else if (data.image_context === "Consistent") {
-                html += `<p class="text-sm mt-1 text-green-600 dark:text-green-400">✓ Image matches the headline</p>`;
-            } else {
-                html += `<p class="text-sm mt-1">${data.image_context}</p>`;
-            }
-            
-            // Show similarity score if available
-            if (data.similarity_score !== undefined && data.similarity_score !== null) {
-                html += `<p class="text-xs mt-1 text-subtext-light dark:text-subtext-dark">Similarity: ${(data.similarity_score * 100).toFixed(1)}%</p>`;
-            }
+
+    // --- Rendering ---
+
+    function renderResults(data) {
+        resultsSection.classList.remove('hidden');
+
+        // 1. Verdict Card
+        const verdictBadge = document.getElementById('verdict-badge');
+        const verdictSummary = document.getElementById('verdict-summary');
+        const verdictColorBar = document.getElementById('verdict-color-bar');
+        const confidenceValue = document.getElementById('confidence-value');
+        const confidenceBar = document.getElementById('confidence-bar');
+        const cacheBadge = document.getElementById('cache-badge');
+
+        // Determine Verdict State
+        const label = data.final_label || 'Unknown';
+        const score = data.final_trust_score || 0;
+        // Map backend 'reason' to UI 'explanation'
+        const summary = data.explanation || data.reason || 'No explanation provided.';
+
+        let badgeClass = 'bg-gray-100 text-gray-600';
+        let barClass = 'bg-gray-600';
+
+        if (label.toLowerCase().includes('fake') || label.toLowerCase().includes('false') || label.toLowerCase().includes('risk')) {
+            badgeClass = 'bg-red-100 text-red-700 border border-red-200 badge-pulse-red';
+            barClass = 'bg-danger';
+        } else if (label.toLowerCase().includes('credible') || label.toLowerCase().includes('real') || label.toLowerCase().includes('true')) {
+            badgeClass = 'bg-green-100 text-green-700 border border-green-200 badge-pulse-green';
+            barClass = 'bg-success';
         } else {
-            // Check if an image was actually uploaded by checking the image input
-            const imageInput = document.getElementById('image-input');
-            const imageFile = imageInput ? imageInput.files[0] : null;
-            
-            if (imageFile) {
-                // Image was uploaded but analysis failed or wasn't performed
-                html += `<p class="text-sm text-orange-600 dark:text-orange-400">⚠ Image uploaded but analysis unavailable</p>`;
-            } else {
-                // No image was provided
-                html += `<p class="text-sm text-subtext-light dark:text-subtext-dark">No image provided</p>`;
-            }
+            badgeClass = 'bg-amber-100 text-amber-700 border border-amber-200 badge-pulse-amber';
+            barClass = 'bg-warning';
         }
-        
-        imageContextDiv.innerHTML = html;
-    }
-    
-    // Display source verification with dynamic messaging
-    const sourceVerificationDiv = document.getElementById('source-verification-result');
-    if (sourceVerificationDiv) {
-        let html = '';
-        
-        // Check if image was analyzed
-        const hasImageContext = data.image_context !== undefined && data.image_context !== null && data.image_context !== '';
-        const imageMismatch = hasImageContext && (data.image_context === "Mismatch" || data.image_context === "Suspicious Mismatch");
-        
-        // Check for new verification structure with tier-based classification
-        const verification = data.verification || null;
-        const coverageLevel = verification && verification.source_coverage_level ? verification.source_coverage_level : null;
-        const articles = verification && verification.articles ? verification.articles : [];
-        
-        // Display tier-based source coverage
-        if (coverageLevel && articles.length > 0) {
-            // Determine tier color and message
-            let tierColor = '';
-            let tierMessage = '';
-            
-            if (coverageLevel.includes('Tier 1')) {
-                tierColor = 'text-green-600 dark:text-green-400';
-                tierMessage = '✓ Covered by Global Neutral Sources';
-            } else if (coverageLevel.includes('Tier 2')) {
-                tierColor = 'text-blue-600 dark:text-blue-400';
-                tierMessage = '✓ Covered by Major Media Sources';
-            } else if (coverageLevel.includes('Tier 3')) {
-                tierColor = 'text-yellow-600 dark:text-yellow-400';
-                tierMessage = '✓ Covered by Regional/Other Sources';
-            }
-            
-            html += `<p class="text-sm font-bold ${tierColor} mb-2">${tierMessage}</p>`;
-            html += `<p class="text-xs text-subtext-light dark:text-subtext-dark mb-2">Coverage Level: ${coverageLevel}</p>`;
-            html += `<ul class="list-none space-y-2 ml-2">`;
-            articles.forEach(article => {
-                html += `<li class="text-sm">`;
-                html += `<a href="${article.url}" target="_blank" rel="noopener noreferrer" `;
-                html += `class="text-blue-600 dark:text-blue-400 hover:underline font-medium">`;
-                html += `• ${article.source}`;
-                html += `</a>`;
-                if (article.title) {
-                    html += `<span class="text-xs text-subtext-light dark:text-subtext-dark block ml-4 mt-0.5">${article.title}</span>`;
+
+        verdictBadge.textContent = label;
+        verdictBadge.className = `px-4 py-1 rounded-full text-sm font-black uppercase tracking-wide transition-all duration-500 ${badgeClass}`;
+        verdictColorBar.className = `absolute left-0 top-0 bottom-0 w-2 transition-colors duration-500 ${barClass}`;
+        verdictSummary.textContent = summary;
+
+        // Confidence
+        // Estimate confidence if not provided directly
+        const confidence = Math.abs(score - 50) * 2;
+        confidenceValue.textContent = `${Math.round(confidence)}%`;
+
+        // Animate Confidence Bar
+        setTimeout(() => {
+            confidenceBar.style.width = `${confidence}%`;
+            confidenceBar.className = `bg-primary h-2.5 rounded-full transition-all duration-1000 ${barClass}`;
+        }, 100);
+
+        // Cache Hit
+        if (data.cache_hit) {
+            cacheBadge.classList.remove('hidden');
+            cacheBadge.classList.add('inline-flex');
+        } else {
+            cacheBadge.classList.add('hidden');
+            cacheBadge.classList.remove('inline-flex');
+        }
+
+        // 2. Trust Score Animation
+        const trustScoreValue = document.getElementById('trust-score-value');
+        const trustScoreCircle = document.getElementById('trust-score-circle');
+        const trustScoreLabel = document.getElementById('trust-score-label');
+
+        // Reset animation
+        trustScoreCircle.style.strokeDashoffset = 376.99;
+
+        // Animate
+        setTimeout(() => {
+            const offset = 376.99 - (376.99 * score) / 100;
+            trustScoreCircle.style.strokeDashoffset = offset;
+
+            // Color based on score
+            trustScoreCircle.classList.remove('text-success', 'text-warning', 'text-danger');
+            if (score >= 70) trustScoreCircle.classList.add('text-success');
+            else if (score >= 40) trustScoreCircle.classList.add('text-warning');
+            else trustScoreCircle.classList.add('text-danger');
+        }, 100);
+
+        // Counter animation
+        animateValue(trustScoreValue, 0, score, 1500);
+
+        trustScoreLabel.textContent = score >= 70 ? 'High Credibility' : (score >= 40 ? 'Questionable' : 'Low Credibility');
+
+        // 3. Explanation Panel
+        const explanationContent = document.getElementById('explanation-content');
+        // Handle list if it exists (user requirement), otherwise string
+        if (Array.isArray(data.explanation) && data.explanation.length > 0) {
+            let html = '<div class="flex flex-wrap gap-2">';
+            data.explanation.forEach(item => {
+                // Assuming item is {word: "...", score: ...} or just string
+                const word = typeof item === 'object' ? item.word : item;
+                html += `<span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs font-medium">${word}</span>`;
+            });
+            html += '</div>';
+            explanationContent.innerHTML = html;
+        } else {
+            explanationContent.innerHTML = `<p class="text-sm leading-relaxed">${summary}</p>`;
+        }
+
+        // 4. Image Context
+        const imageContextContent = document.getElementById('image-context-content');
+        if (imageContextContent) {
+            if (data.image_context && data.image_context !== "No Image") {
+                let statusColor = 'text-gray-600';
+                let statusIcon = 'image';
+
+                if (data.image_context.includes('Consistent')) {
+                    statusColor = 'text-success';
+                    statusIcon = 'check_circle';
+                } else if (data.image_context.includes('Mismatch')) {
+                    statusColor = 'text-danger';
+                    statusIcon = 'error';
                 }
-                html += `</li>`;
-            });
-            html += `</ul>`;
-        }
-        // CASE 2: No coverage found
-        else if (coverageLevel === "No Coverage Found" || (coverageLevel && articles.length === 0)) {
-            html += `<p class="text-sm font-medium text-orange-600 dark:text-orange-400 mb-1">⚠ No news source coverage found yet.</p>`;
-            if (imageMismatch) {
-                html += `<p class="text-sm text-text-light dark:text-text-dark mt-1">Content not confirmed by news sources and the image does not align with the text.</p>`;
+
+                imageContextContent.innerHTML = `
+                    <div class="flex flex-col items-center justify-center text-center h-full animate-in fade-in">
+                        <span class="material-symbols-outlined text-3xl ${statusColor} mb-2">${statusIcon}</span>
+                        <p class="font-bold ${statusColor}">${data.image_context}</p>
+                        ${data.similarity_score !== undefined ? `
+                            <div class="w-full max-w-[120px] mt-2">
+                                <div class="flex justify-between text-[10px] text-subtext-light mb-1">
+                                    <span>Similarity</span>
+                                    <span>${(data.similarity_score * 100).toFixed(0)}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                    <div class="bg-primary h-1.5 rounded-full" style="width: ${(data.similarity_score * 100)}%"></div>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
             } else {
-                html += `<p class="text-sm text-text-light dark:text-text-dark mt-1">This may be breaking news, regional content, or content that hasn't reached major outlets yet.</p>`;
-                html += `<p class="text-xs mt-1 text-subtext-light dark:text-subtext-dark italic">Breaking news may take time to appear on established news outlets.</p>`;
+                imageContextContent.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-40 text-center">
+                        <span class="material-symbols-outlined text-4xl text-gray-300 dark:text-gray-600 mb-2">hide_image</span>
+                        <p class="text-subtext-light dark:text-subtext-dark text-sm">No image analyzed</p>
+                    </div>
+                `;
             }
         }
-        // Fallback: Legacy format support (backward compatibility)
-        else if (verification && verification.status === "Verified" && verification.sources && verification.sources.length > 0) {
-            html += `<p class="text-sm font-bold text-green-600 dark:text-green-400 mb-2">✓ Covered by News Sources</p>`;
-            html += `<ul class="list-none space-y-1 ml-2">`;
-            verification.sources.forEach(source => {
-                html += `<li class="text-sm">`;
-                html += `<a href="${source.url}" target="_blank" rel="noopener noreferrer" `;
-                html += `class="text-blue-600 dark:text-blue-400 hover:underline font-medium">`;
-                html += `• ${source.name}</a>`;
-                html += `</li>`;
-            });
-            html += `</ul>`;
-        }
-        else if (verification && verification.status === "Unverified") {
-            html += `<p class="text-sm font-medium text-orange-600 dark:text-orange-400 mb-1">⚠ No news source coverage found yet.</p>`;
-            html += `<p class="text-xs mt-1 text-subtext-light dark:text-subtext-dark italic">This content hasn't been found on established news outlets yet.</p>`;
-        }
-        // Fallback: Legacy format support (backward compatibility)
-        else if (data.verification_note) {
-            if (data.verification_note.includes("Verified by")) {
-                const sourceMatch = data.verification_note.match(/Verified by (.+)/);
-                const source = sourceMatch ? sourceMatch[1] : "trusted source";
-                html += `<p class="text-sm font-bold text-green-600 dark:text-green-400">✔ Claim verified by trusted source(s): ${source}</p>`;
-            } else if (data.verification_note === "Unverified claim" && !imageMismatch) {
-                html += `<p class="text-sm text-text-light dark:text-text-dark">Text style appears neutral, but no confirmation was found from major trusted sources yet.</p>`;
-                html += `<p class="text-xs mt-1 text-subtext-light dark:text-subtext-dark italic">Breaking or regional news may take time to appear on global outlets.</p>`;
-            } else if (data.verification_note === "Unverified claim" && imageMismatch) {
-                html += `<p class="text-sm text-text-light dark:text-text-dark">Claim is not confirmed by trusted sources and the image does not align with the text.</p>`;
+
+        // 5. Source Verification
+        const sourceContent = document.getElementById('source-verification-content');
+        if (sourceContent) {
+            // Check for verification object or legacy note
+            const verification = data.verification;
+            let verificationNote = data.verification_note;
+            let articles = [];
+
+            if (!verificationNote && verification) {
+                if (verification.source_coverage_level) {
+                    verificationNote = verification.source_coverage_level;
+                }
+                if (verification.articles) {
+                    articles = verification.articles;
+                }
+            }
+
+            if (verificationNote) {
+                let icon = 'info';
+                let color = 'text-blue-600';
+                let bg = 'bg-blue-50';
+
+                // Determine status based on text content
+                const lowerNote = verificationNote.toLowerCase();
+                if (lowerNote.includes('verified') || lowerNote.includes('tier 1') || lowerNote.includes('tier 2')) {
+                    icon = 'verified';
+                    color = 'text-success';
+                    bg = 'bg-green-50';
+                } else if (lowerNote.includes('unverified') || lowerNote.includes('no coverage')) {
+                    icon = 'warning';
+                    color = 'text-warning';
+                    bg = 'bg-amber-50';
+                }
+
+                let html = `
+                    <div class="flex items-start gap-3 p-3 rounded-lg ${bg} dark:bg-opacity-10 animate-in fade-in">
+                        <span class="material-symbols-outlined ${color} mt-0.5 text-lg">${icon}</span>
+                        <div>
+                            <p class="text-sm font-bold text-text-light dark:text-text-dark mb-1">Source Status</p>
+                            <p class="text-xs text-subtext-light dark:text-subtext-dark leading-relaxed font-medium">${verificationNote}</p>
+                        </div>
+                    </div>
+                `;
+
+                // Add articles list if available
+                if (articles.length > 0) {
+                    html += `<div class="mt-3 pl-2 border-l-2 border-border-light dark:border-border-dark space-y-2">`;
+                    articles.slice(0, 3).forEach(article => {
+                        html += `
+                            <a href="${article.url}" target="_blank" class="block text-xs group">
+                                <span class="font-bold text-text-light dark:text-text-dark group-hover:text-primary transition-colors">${article.source}</span>
+                                <span class="block text-subtext-light dark:text-subtext-dark truncate">${article.title}</span>
+                            </a>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+
+                sourceContent.innerHTML = html;
             } else {
-                html += `<p class="text-sm">${data.verification_note}</p>`;
+                sourceContent.innerHTML = `<p class="text-sm text-subtext-light">No source verification data.</p>`;
             }
         }
-        // Fallback: show reason if no verification data
-        else if (data.reason) {
-            html += `<p class="text-sm">${data.reason}</p>`;
-        }
-        
-        // CASE 3: Append cache note if cached
-        if (data.cached === true || data.cache_hit === true) {
-            html += `<p class="text-xs mt-2 text-subtext-light dark:text-subtext-dark italic">Previously analyzed result (cache hit).</p>`;
-        }
-        
-        // Show response time if available
-        if (data.response_time_ms !== undefined) {
-            html += `<p class="text-xs mt-2 text-gray-500 dark:text-gray-400">Response: ${data.response_time_ms}ms</p>`;
-        }
-        
-        sourceVerificationDiv.innerHTML = html || '<p>No verification data available.</p>';
-    }
-    
-    // Display final verdict
-    const finalVerdictDiv = document.getElementById('final-verdict-result');
-    if (finalVerdictDiv) {
-        let html = '';
-        if (data.final_label) {
-            html += `<p class="text-2xl font-bold mb-2">${data.final_label}</p>`;
-        }
-        if (data.final_trust_score !== undefined) {
-            const scoreColor = data.final_trust_score >= 70 ? 'text-green-600 dark:text-green-400' : 
-                             data.final_trust_score >= 50 ? 'text-yellow-600 dark:text-yellow-400' : 
-                             'text-red-600 dark:text-red-400';
-            html += `<p class="text-xl font-semibold ${scoreColor}">Trust Score: ${data.final_trust_score}%</p>`;
-        }
-        if (data.reason) {
-            html += `<p class="text-base mt-2">${data.reason}</p>`;
-        }
-        finalVerdictDiv.innerHTML = html || '<p>No verdict data available.</p>';
-    }
-}
 
-function showError(message) {
-    // Remove existing error messages
-    const existingError = document.querySelector('.error-message');
-    if (existingError) {
-        existingError.remove();
-    }
-    
-    // Create error message
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
-    
-    // Insert before results section
-    const resultsSection = document.querySelector('.space-y-8');
-    if (resultsSection) {
-        resultsSection.parentNode.insertBefore(errorDiv, resultsSection);
-    } else {
-        // Fallback: insert at top of main content
-        const main = document.querySelector('main');
-        if (main) {
-            main.insertBefore(errorDiv, main.firstChild);
+        // 6. Response Time
+        const responseTime = document.getElementById('response-time');
+        if (responseTime && data.response_time_ms) {
+            responseTime.textContent = `Response time: ${data.response_time_ms}ms`;
         }
-    }
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        errorDiv.remove();
-    }, 5000);
-}
 
+        // Scroll to results
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // --- Utilities ---
+
+    function showError(message) {
+        errorContainer.innerHTML = `
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 shadow-sm">
+                <span class="material-symbols-outlined">error</span>
+                <p class="text-sm font-medium">${message}</p>
+            </div>
+        `;
+        errorContainer.classList.remove('hidden');
+    }
+
+    function hideError() {
+        errorContainer.classList.add('hidden');
+        errorContainer.innerHTML = '';
+    }
+
+    function readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function animateValue(obj, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = Math.floor(progress * (end - start) + start) + "%";
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+});
