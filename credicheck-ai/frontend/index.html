@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrediCheck AI - About</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b8cee",
+                        "background-light": "#f8f9fa",
+                        "background-dark": "#101922",
+                        "card-light": "#ffffff",
+                        "card-dark": "#182431",
+                        "text-light": "#0d141b",
+                        "text-dark": "#e7edf3",
+                        "subtext-light": "#4c739a",
+                        "subtext-dark": "#94a3b8",
+                        "border-light": "#cfdbe7",
+                        "border-dark": "#334155",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "md": "0.375rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+    <div class="relative flex min-h-screen w-full flex-col items-center text-gray-800 dark:text-gray-200">
+        <header class="w-full max-w-5xl px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-700 py-4">
+                <div class="flex items-center gap-3 text-gray-900 dark:text-white">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white">
+                        <span class="material-symbols-outlined text-xl">verified</span>
+                    </div>
+                    <h1 class="text-xl font-bold">CrediCheck AI</h1>
+                </div>
+            </div>
+        </header>
+        
+        <main class="flex w-full max-w-5xl flex-1 flex-col items-center px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+            <div class="flex w-full flex-col items-center gap-3 text-center mb-8">
+                <p class="text-primary text-base font-bold leading-normal">About CrediCheck AI</p>
+                <p class="text-gray-900 dark:text-white text-4xl sm:text-5xl font-black leading-tight tracking-tighter">Credibility Analysis for Digital Content</p>
+                <p class="max-w-2xl text-gray-500 dark:text-gray-400 text-lg font-normal leading-normal">CrediCheck AI provides a comprehensive credibility score by cross-referencing text, images, and trusted sources.</p>
+            </div>
+            <div class="w-full max-w-3xl text-center space-y-4 mb-16">
+                <p class="text-gray-700 dark:text-gray-300 text-base font-normal leading-relaxed">
+                    The spread of misinformation erodes trust. It's increasingly difficult to distinguish fact from fiction online.
+                </p>
+            </div>
+            <h2 class="text-gray-900 dark:text-white text-3xl font-bold leading-tight tracking-tight mb-12">How It Works</h2>
+            <div class="grid w-full max-w-4xl grid-cols-1 gap-8 md:grid-cols-3 mb-16">
+                <div class="flex flex-col items-center gap-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-6 text-center">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary">
+                        <span class="material-symbols-outlined text-2xl">text_fields</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Linguistic Analysis</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Scans text for emotional manipulation and signs of bias.</p>
+                </div>
+                <div class="flex flex-col items-center gap-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-6 text-center">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary">
+                        <span class="material-symbols-outlined text-2xl">image_search</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Image–Text Consistency</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Verifies if images and their surrounding text are contextually aligned.</p>
+                </div>
+                <div class="flex flex-col items-center gap-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-6 text-center">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary">
+                        <span class="material-symbols-outlined text-2xl">fact_check</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Trusted Source Verification</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Cross-references claims with a database of reputable sources.</p>
+                </div>
+            </div>
+            <div class="mt-8">
+                <a href="verify.html" class="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-base font-bold text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark">
+                    Verify Content
+                </a>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
