@@ -228,31 +228,92 @@ function displayResults(data) {
         const hasImageContext = data.image_context !== undefined && data.image_context !== null && data.image_context !== '';
         const imageMismatch = hasImageContext && (data.image_context === "Mismatch" || data.image_context === "Suspicious Mismatch");
         
-        // CASE 1: Verified by trusted source
-        if (data.verification_note && data.verification_note.includes("Verified by")) {
-            const sourceMatch = data.verification_note.match(/Verified by (.+)/);
-            const source = sourceMatch ? sourceMatch[1] : "trusted source";
-            html += `<p class="text-sm font-bold text-green-600 dark:text-green-400">✔ Claim verified by trusted source(s): ${source}</p>`;
+        // Check for new verification structure with tier-based classification
+        const verification = data.verification || null;
+        const coverageLevel = verification && verification.source_coverage_level ? verification.source_coverage_level : null;
+        const articles = verification && verification.articles ? verification.articles : [];
+        
+        // Display tier-based source coverage
+        if (coverageLevel && articles.length > 0) {
+            // Determine tier color and message
+            let tierColor = '';
+            let tierMessage = '';
+            
+            if (coverageLevel.includes('Tier 1')) {
+                tierColor = 'text-green-600 dark:text-green-400';
+                tierMessage = '✓ Covered by Global Neutral Sources';
+            } else if (coverageLevel.includes('Tier 2')) {
+                tierColor = 'text-blue-600 dark:text-blue-400';
+                tierMessage = '✓ Covered by Major Media Sources';
+            } else if (coverageLevel.includes('Tier 3')) {
+                tierColor = 'text-yellow-600 dark:text-yellow-400';
+                tierMessage = '✓ Covered by Regional/Other Sources';
+            }
+            
+            html += `<p class="text-sm font-bold ${tierColor} mb-2">${tierMessage}</p>`;
+            html += `<p class="text-xs text-subtext-light dark:text-subtext-dark mb-2">Coverage Level: ${coverageLevel}</p>`;
+            html += `<ul class="list-none space-y-2 ml-2">`;
+            articles.forEach(article => {
+                html += `<li class="text-sm">`;
+                html += `<a href="${article.url}" target="_blank" rel="noopener noreferrer" `;
+                html += `class="text-blue-600 dark:text-blue-400 hover:underline font-medium">`;
+                html += `• ${article.source}`;
+                html += `</a>`;
+                if (article.title) {
+                    html += `<span class="text-xs text-subtext-light dark:text-subtext-dark block ml-4 mt-0.5">${article.title}</span>`;
+                }
+                html += `</li>`;
+            });
+            html += `</ul>`;
         }
-        // CASE 2: Unverified claim without image or with consistent image
-        else if (data.verification_note === "Unverified claim" && !imageMismatch) {
-            html += `<p class="text-sm text-text-light dark:text-text-dark">Text style appears neutral, but no confirmation was found from major trusted sources yet.</p>`;
-            html += `<p class="text-xs mt-1 text-subtext-light dark:text-subtext-dark italic">Breaking or regional news may take time to appear on global outlets.</p>`;
+        // CASE 2: No coverage found
+        else if (coverageLevel === "No Coverage Found" || (coverageLevel && articles.length === 0)) {
+            html += `<p class="text-sm font-medium text-orange-600 dark:text-orange-400 mb-1">⚠ No news source coverage found yet.</p>`;
+            if (imageMismatch) {
+                html += `<p class="text-sm text-text-light dark:text-text-dark mt-1">Content not confirmed by news sources and the image does not align with the text.</p>`;
+            } else {
+                html += `<p class="text-sm text-text-light dark:text-text-dark mt-1">This may be breaking news, regional content, or content that hasn't reached major outlets yet.</p>`;
+                html += `<p class="text-xs mt-1 text-subtext-light dark:text-subtext-dark italic">Breaking news may take time to appear on established news outlets.</p>`;
+            }
         }
-        // CASE 3: Unverified claim with image mismatch
-        else if (data.verification_note === "Unverified claim" && imageMismatch) {
-            html += `<p class="text-sm text-text-light dark:text-text-dark">Claim is not confirmed by trusted sources and the image does not align with the text.</p>`;
+        // Fallback: Legacy format support (backward compatibility)
+        else if (verification && verification.status === "Verified" && verification.sources && verification.sources.length > 0) {
+            html += `<p class="text-sm font-bold text-green-600 dark:text-green-400 mb-2">✓ Covered by News Sources</p>`;
+            html += `<ul class="list-none space-y-1 ml-2">`;
+            verification.sources.forEach(source => {
+                html += `<li class="text-sm">`;
+                html += `<a href="${source.url}" target="_blank" rel="noopener noreferrer" `;
+                html += `class="text-blue-600 dark:text-blue-400 hover:underline font-medium">`;
+                html += `• ${source.name}</a>`;
+                html += `</li>`;
+            });
+            html += `</ul>`;
         }
-        // Fallback: show verification_note as-is if it exists
+        else if (verification && verification.status === "Unverified") {
+            html += `<p class="text-sm font-medium text-orange-600 dark:text-orange-400 mb-1">⚠ No news source coverage found yet.</p>`;
+            html += `<p class="text-xs mt-1 text-subtext-light dark:text-subtext-dark italic">This content hasn't been found on established news outlets yet.</p>`;
+        }
+        // Fallback: Legacy format support (backward compatibility)
         else if (data.verification_note) {
-            html += `<p class="text-sm">${data.verification_note}</p>`;
+            if (data.verification_note.includes("Verified by")) {
+                const sourceMatch = data.verification_note.match(/Verified by (.+)/);
+                const source = sourceMatch ? sourceMatch[1] : "trusted source";
+                html += `<p class="text-sm font-bold text-green-600 dark:text-green-400">✔ Claim verified by trusted source(s): ${source}</p>`;
+            } else if (data.verification_note === "Unverified claim" && !imageMismatch) {
+                html += `<p class="text-sm text-text-light dark:text-text-dark">Text style appears neutral, but no confirmation was found from major trusted sources yet.</p>`;
+                html += `<p class="text-xs mt-1 text-subtext-light dark:text-subtext-dark italic">Breaking or regional news may take time to appear on global outlets.</p>`;
+            } else if (data.verification_note === "Unverified claim" && imageMismatch) {
+                html += `<p class="text-sm text-text-light dark:text-text-dark">Claim is not confirmed by trusted sources and the image does not align with the text.</p>`;
+            } else {
+                html += `<p class="text-sm">${data.verification_note}</p>`;
+            }
         }
-        // Fallback: show reason if no verification_note
+        // Fallback: show reason if no verification data
         else if (data.reason) {
             html += `<p class="text-sm">${data.reason}</p>`;
         }
         
-        // CASE 4: Append cache note if cached
+        // CASE 3: Append cache note if cached
         if (data.cached === true || data.cache_hit === true) {
             html += `<p class="text-xs mt-2 text-subtext-light dark:text-subtext-dark italic">Previously analyzed result (cache hit).</p>`;
         }

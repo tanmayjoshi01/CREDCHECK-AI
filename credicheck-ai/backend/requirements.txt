@@ -9,3 +9,4 @@ scikit-learn
 duckduckgo-search
 lime
 shap
+requests

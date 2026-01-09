@@ -12,12 +12,23 @@ import base64
 import io
 import os
 from duckduckgo_search import DDGS
+from urllib.parse import urlparse
 
 app = Flask(__name__)
 CORS(app)
 
 cache = {}
 RESULTS_CACHE = {}
+
+# Source tier definitions
+TIER_1_DOMAINS = ["bbc", "reuters", "apnews", "npr"]
+TIER_2_DOMAINS = ["cnn", "foxnews", "theguardian", "nytimes", "aljazeera", "washingtonpost", "bloomberg"]
+TIER_1_NAMES = {"bbc": "BBC News", "reuters": "Reuters", "apnews": "AP News", "npr": "NPR"}
+TIER_2_NAMES = {
+    "cnn": "CNN", "foxnews": "Fox News", "theguardian": "The Guardian",
+    "nytimes": "The New York Times", "aljazeera": "Al Jazeera",
+    "washingtonpost": "The Washington Post", "bloomberg": "Bloomberg"
+}
 
 # Load all models at startup
 print("Loading models...")
@@ -27,28 +38,89 @@ spacy_nlp = spacy.load("en_core_web_sm")
 clip_model = SentenceTransformer('clip-ViT-B-32')
 print("Models loaded successfully!")
 
-# Helper function for headline verification
+# Helper function for headline verification using DuckDuckGo Search with tier-based classification
 def verify_headline(headline):
-    trusted_domains = ["bbc", "reuters", "apnews", "npr", "gov", "edu"]
+    articles = []
+    tier_found = None
     
     try:
         with DDGS() as ddgs:
-            results = list(ddgs.text(headline, max_results=3))
+            results = list(ddgs.text(headline, max_results=10))
         
         for result in results:
-            url = result.get('href', '').lower()
-            for domain in trusted_domains:
-                if domain in url:
-                    source_name = domain.capitalize()
-                    if domain == "gov":
-                        source_name = "Government"
-                    elif domain == "edu":
-                        source_name = "Educational"
-                    return f"Verified by {source_name}"
+            url = result.get('href', '')
+            url_lower = url.lower()
+            title = result.get('title', '')
+            
+            # Determine tier based on URL domain
+            source_tier = None
+            source_name = None
+            
+            # Check Tier 1 (Global Neutral)
+            for domain in TIER_1_DOMAINS:
+                if domain in url_lower:
+                    source_tier = 1
+                    source_name = TIER_1_NAMES.get(domain, domain.capitalize())
+                    break
+            
+            # Check Tier 2 (Major Media) if not Tier 1
+            if source_tier is None:
+                for domain in TIER_2_DOMAINS:
+                    if domain in url_lower:
+                        source_tier = 2
+                        source_name = TIER_2_NAMES.get(domain, domain.capitalize())
+                        break
+            
+            # Check Tier 3 (Regional/Others) - any valid news domain
+            if source_tier is None:
+                # Common news domain patterns
+                news_patterns = ['.com/', '.org/', '.net/', '.edu/']
+                if any(pattern in url_lower for pattern in news_patterns) and url_lower.startswith('http'):
+                    # Extract domain name
+                    try:
+                        parsed = urlparse(url)
+                        domain_parts = parsed.netloc.replace('www.', '').split('.')
+                        if len(domain_parts) >= 2:
+                            source_tier = 3
+                            source_name = domain_parts[0].capitalize()
+                    except:
+                        pass
+            
+            # Add article if it's a valid news source and not duplicate
+            if source_tier and source_name and url:
+                if not any(a['url'] == url for a in articles):
+                    articles.append({
+                        "title": title,
+                        "source": source_name,
+                        "url": url,
+                        "tier": source_tier
+                    })
+                    
+                    # Track the highest tier found
+                    if tier_found is None or source_tier < tier_found:
+                        tier_found = source_tier
         
-        return "Unverified claim"
+        # Determine source_coverage_level based on highest tier found
+        if tier_found == 1:
+            source_coverage_level = "Tier 1 - Global Neutral"
+        elif tier_found == 2:
+            source_coverage_level = "Tier 2 - Major Media"
+        elif tier_found == 3:
+            source_coverage_level = "Tier 3 - Regional/Others"
+        else:
+            source_coverage_level = "No Coverage Found"
+        
+        # Return structured response with tier-based classification
+        return {
+            "source_coverage_level": source_coverage_level,
+            "articles": articles
+        }
     except Exception:
-        return "Unverified claim"
+        # Graceful fallback on any error
+        return {
+            "source_coverage_level": "No Coverage Found",
+            "articles": []
+        }
 
 # Analysis functions using global models
 def analyze_text(text):
@@ -80,13 +152,13 @@ def analyze_text(text):
                 seen.add(entity_text)
     
     # Verify headline
-    verification_note = verify_headline(text)
+    verification = verify_headline(text)
     
     return {
         "label": label,
         "score": score,
         "entities": entities,
-        "verification_note": verification_note
+        "verification": verification
     }
 
 def verify_image_context(image_input, headline_text):
@@ -158,7 +230,7 @@ def analyze_text_endpoint():
             'label': result['label'],
             'score': round(result['score'], 2),
             'entities': result['entities'],
-            'verification_note': result['verification_note'],
+            'verification': result['verification'],
             'cached': False
         }
         
@@ -167,7 +239,7 @@ def analyze_text_endpoint():
             'label': result['label'],
             'score': round(result['score'], 2),
             'entities': result['entities'],
-            'verification_note': result['verification_note']
+            'verification': result['verification']
         }
         
         return jsonify(response)
@@ -233,7 +305,7 @@ def analyze_full_endpoint():
             'response_time_ms': round(response_time_ms, 2),
             'image_context': cached_result.get('image_context'),
             'similarity_score': cached_result.get('similarity_score'),
-            'verification_note': cached_result.get('verification_note')
+            'verification': cached_result.get('verification', {'source_coverage_level': 'No Coverage Found', 'articles': []})
         }
         return jsonify(result)
     
@@ -241,7 +313,7 @@ def analyze_full_endpoint():
         text_result = analyze_text(text)
         text_label = text_result['label']
         text_confidence = text_result['score']
-        verification_note = text_result.get('verification_note', 'Unverified claim')
+        verification = text_result.get('verification', {'source_coverage_level': 'No Coverage Found', 'articles': []})
         
         # Image analysis (skip if image not provided)
         image_context = None
@@ -312,7 +384,7 @@ def analyze_full_endpoint():
             'final_label': final_label,
             'final_trust_score': final_trust_score,
             'reason': reason,
-            'verification_note': verification_note
+            'verification': verification
         }
         
         # Add image context to result if available
