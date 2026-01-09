@@ -138,9 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
             analyzeLoading.classList.add('hidden');
         }
     }
-
-    // --- Rendering ---
-
     function renderResults(data) {
         resultsSection.classList.remove('hidden');
 
@@ -297,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            if (verificationNote) {
+            if (verificationNote && verificationNote !== "No Coverage Found") {
                 let icon = 'info';
                 let color = 'text-blue-600';
                 let bg = 'bg-blue-50';
@@ -340,7 +337,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 sourceContent.innerHTML = html;
             } else {
-                sourceContent.innerHTML = `<p class="text-sm text-subtext-light">No source verification data.</p>`;
+                sourceContent.innerHTML = `
+                    <div class="flex items-center gap-2 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 text-subtext-light dark:text-subtext-dark">
+                        <span class="material-symbols-outlined text-lg">travel_explore</span>
+                        <p class="text-xs">No verified sources found yet. This may be breaking or emerging news.</p>
+                    </div>
+                `;
             }
         }
 
@@ -353,8 +355,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Scroll to results
         resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-
-    // --- Utilities ---
 
     function showError(message) {
         errorContainer.innerHTML = `

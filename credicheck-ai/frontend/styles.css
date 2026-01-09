@@ -129,13 +129,15 @@
 
 /* Glassmorphism */
 .glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .dark .glass {
-    background: rgba(16, 25, 34, 0.7);
+    background: rgba(24, 36, 49, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 /* Trust Score Circle */
@@ -184,4 +186,14 @@
 .badge-pulse-amber {
     --badge-color: 245, 158, 11;
     animation: badge-pulse 2s infinite;
+}
+
+/* Global Background */
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #eef2f7 50%, #f9fafb 100%);
+    background-attachment: fixed;
+}
+
+.dark body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
 }
